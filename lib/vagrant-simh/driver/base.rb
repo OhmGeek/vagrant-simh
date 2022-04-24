@@ -84,7 +84,7 @@ module VagrantPlugins
         def ssh_port(expected); end
 
         # Starts the virtual machine.
-        def start; end
+        def start(data_dir); end
 
         # Suspend the virtual machine.
         def suspend; end

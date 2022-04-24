@@ -10,7 +10,7 @@ module VagrantPlugins
       class Version_4 < Base
         def initialize(emulator)
           super(emulator)
-
+          @emulator = emulator
           @logger = Log4r::Logger.new('vagrant::provider::simh::simh4')
         end
 
@@ -24,8 +24,9 @@ module VagrantPlugins
           expected
         end
 
-        def start
-          command = ['']
+        def start(data_dir)
+            # Use the ini file of the emulator
+          command = ["#{data_dir}/#{@emulator}.ini"]
           r = raw(*command)
 
           if r.exit_code != 0

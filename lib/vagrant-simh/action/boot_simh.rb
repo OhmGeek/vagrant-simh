@@ -11,7 +11,7 @@ module VagrantPlugins
 
         def call(env)
           env[:ui].info('Starting SimH')
-          env[:machine].provider.driver.start
+          env[:machine].provider.driver.start(env[:machine].box.directory)
           env[:ui].info('SimH started')
           @app.call(env)
         end

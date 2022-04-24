@@ -5,7 +5,7 @@ module VagrantPlugins
   module SimH
     class Provider < Vagrant.plugin('2', :provider)
       attr_reader :driver
-      
+
       def initialize(machine)
         @machine = machine
         # TODO : Allow the user to change exactly what emu to use
