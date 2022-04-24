@@ -146,6 +146,7 @@ module VagrantPlugins
           # Append in the options for subprocess
           command << { notify: %i[stdout stderr] }
 
+          ## TODO : we need to look at this to background the process (just spawn and return)
           Vagrant::Util::Busy.busy(int_callback) do
             Dir.chdir(work_dir) do
               Vagrant::Util::Subprocess.execute(@simh_path, *command, &block)
