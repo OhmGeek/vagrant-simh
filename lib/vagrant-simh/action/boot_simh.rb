@@ -11,7 +11,11 @@ module VagrantPlugins
 
                 def call(env)
                     env[:ui].info("Starting SimH")
-                    exec("/bin/ls")
+                    fork {
+                        exec("/home/ryan/Documents/dev/simh/BIN/vax780")
+                    }
+                    env[:ui].info("SimH started")
+                    @app.call(env)
                 end
             end
         end

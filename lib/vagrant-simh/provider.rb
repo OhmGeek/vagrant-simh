@@ -14,7 +14,17 @@ module VagrantPlugins
         # given action.
         action_method = "action_#{name}"
         return Action.send(action_method) if Action.respond_to?(action_method)
-        nil
+      end
+
+      def state
+        env = @machine.action("read_state", lock: false)
+
+        state_id = env[:machine_state_id]
+
+        # TODO fetch these from configuration.
+        short = "blah"
+        long = "blah"
+        Vagrant::MachineState.new(state_id, short, long)
       end
     end
   end
