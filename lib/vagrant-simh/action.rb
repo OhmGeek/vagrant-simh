@@ -4,6 +4,10 @@ require 'log4r'
 module VagrantPlugins
   module SimH
     module Action
+      action_root = Pathname.new(File.expand_path('../action', __FILE__))
+      autoload :BootSimH, action_root.join('boot_simh')
+
+
       # Include the built-in & general modules so we can use them as top level items.
       include Vagrant::Action::Builtin
       include Vagrant::Action::General
@@ -11,7 +15,8 @@ module VagrantPlugins
 
       def self.action_up
         Vagrant::Action::Builder.new.tap do |b|
-          # TODO here we load the associated actions from the action/* based on simh startup.
+          # Vagrant up just boots SimH as is. No extra complexity!
+          b.use BootSimH
         end
       end
     end

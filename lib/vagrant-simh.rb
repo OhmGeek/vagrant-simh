@@ -1,4 +1,4 @@
-equire "pathname"
+require "pathname"
 
 require "vagrant-simh/plugin"
 
