@@ -25,15 +25,9 @@ module VagrantPlugins
         end
 
         def start(data_dir)
-            # Use the ini file of the emulator
-          command = ["#{data_dir}/#{@emulator}.ini"]
-          r = raw(*command, data_dir)
-
-          if r.exit_code != 0
-            raise Vagrant::Errors::VBoxManageError,
-                  command: command.inspect,
-                  stderr: r.stderr
-          end
+          # Use the ini file of the emulator
+          arg = "#{data_dir}/vax780.ini > output.log"
+          raw(arg, data_dir)
           true
         end
 

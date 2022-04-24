@@ -9,7 +9,7 @@ module VagrantPlugins
       def initialize(machine)
         @machine = machine
         # TODO : Allow the user to change exactly what emu to use
-        @driver = Driver::Version_4.new('vax780')
+        @driver = Driver::Version_4.new('/home/ryan/Documents/dev/simh/BIN/vax780')
       end
 
       def action(name)

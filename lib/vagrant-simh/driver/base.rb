@@ -1,4 +1,5 @@
 require 'log4r'
+require 'pty'
 
 require 'vagrant/util/busy'
 require 'vagrant/util/platform'
@@ -94,67 +95,20 @@ module VagrantPlugins
         # @return [Boolean]
         def vm_exists?(uuid); end
 
-        # Execute the given subcommand for VBoxManage and return the output.
-        def execute(*command, work_dir, &block)
-          # Get the options hash if it exists
-          opts = {}
-          opts = command.pop if command.last.is_a?(Hash)
-
-          # Execute the command
-          r = raw(*command, work_dir, &block)
-
-          # If the command was a failure, then raise an exception that is
-          # nicely handled by Vagrant.
-          if r.exit_code != 0
-            if @interrupted
-              @logger.info('Exit code != 0, but interrupted. Ignoring.')
-            elsif r.exit_code == 126
-              # This exit code happens if SimH emulator is on the PATH,
-              # but another executable it tries to execute is missing.
-              # This is usually indicative of a corrupted SimH install.
-              raise Vagrant::Errors::VBoxManageNotFoundError
-            else
-              errored = true
-            end
-          end
-
-          # TODO: raise custom exception
-          # If there was an error running VBoxManage, show the error and the
-          # output.
-          if errored
-            raise Vagrant::Errors::VBoxManageError,
-                  command: command.inspect,
-                  stderr: r.stderr,
-                  stdout: r.stdout
-          end
-
-          # Return the output, making sure to replace any Windows-style
-          # newlines with Unix-style.
-          r.stdout.gsub("\r\n", "\n")
-        end
-
         # Executes a command and returns the raw result object.
-        def raw(*command, work_dir, &block)
-          int_callback = lambda do
-            @interrupted = true
-
-            # We have to execute this in a thread due to trap contexts
-            # and locks.
-            Thread.new { @logger.info('Interrupted.') }.join
-          end
-
+        def raw(args, work_dir)
           # Append in the options for subprocess
-          command << { notify: %i[stdout stderr] }
-
-          ## TODO : we need to look at this to background the process (just spawn and return)
-          Vagrant::Util::Busy.busy(int_callback) do
-            Dir.chdir(work_dir) do
-              Vagrant::Util::Subprocess.execute(@simh_path, *command, &block)
+          cmd_to_run = "#{@simh_path} #{args}"
+          @logger.info("Spawning Process: #{cmd_to_run}")
+          Dir.chdir(work_dir) do
+            job1 = fork do
+              # Within the fork process, spawn a PTY (as simh expects this to)
+              PTY.spawn(cmd_to_run) do |_reader, _writer, pid|
+                Process.wait(pid)
+              end
             end
+            Process.detach(job1)
           end
-        rescue Vagrant::Util::Subprocess::LaunchError => e
-          raise Vagrant::Errors::VBoxManageLaunchError,
-                message: e.to_s
         end
       end
     end
