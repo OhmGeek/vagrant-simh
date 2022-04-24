@@ -4,7 +4,7 @@ require 'log4r'
 module VagrantPlugins
   module SimH
     module Action
-      action_root = Pathname.new(File.expand_path('../action', __FILE__))
+      action_root = Pathname.new(File.expand_path('action', __dir__))
       autoload :BootSimH, action_root.join('boot_simh')
       autoload :ReadState, action_root.join('read_state')
 
@@ -26,6 +26,5 @@ module VagrantPlugins
         end
       end
     end
-
   end
 end
