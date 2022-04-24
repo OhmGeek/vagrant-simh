@@ -25,3 +25,21 @@ When:
 - simh.emulator
   - This defines the simh binary for example 'vax780' for a VAX 11/780 emulator
 
+## How to build:
+### First time
+`bundle exec vagrant init`
+initialize the VM (only the first time)
+
+`bundle exec vagrant box add simhtest ./simhtest.box` 
+Import the test box (will be saved to ~/.vagrant.d/boxes/simhtest/0/simh/)
+
+`sudo setcap cap_net_raw,cap_net_admin=eip <location of SIMH binary>`
+Enable libpcap access for the nonroot user to the specific SIMH binary. You must have networking support!
+
+### Usual testing:
+
+`bundle install`
+Install the bundle
+
+`bundle exec vagrant up --debug`
+Try to start the Vagrant VM. This prints debug logs to aid development.
