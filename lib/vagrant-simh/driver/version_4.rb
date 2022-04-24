@@ -27,7 +27,7 @@ module VagrantPlugins
         def start(data_dir)
             # Use the ini file of the emulator
           command = ["#{data_dir}/#{@emulator}.ini"]
-          r = raw(*command)
+          r = raw(*command, data_dir)
 
           if r.exit_code != 0
             raise Vagrant::Errors::VBoxManageError,

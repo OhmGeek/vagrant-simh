@@ -95,13 +95,13 @@ module VagrantPlugins
         def vm_exists?(uuid); end
 
         # Execute the given subcommand for VBoxManage and return the output.
-        def execute(*command, &block)
+        def execute(*command, work_dir, &block)
           # Get the options hash if it exists
           opts = {}
           opts = command.pop if command.last.is_a?(Hash)
 
           # Execute the command
-          r = raw(*command, &block)
+          r = raw(*command, work_dir, &block)
 
           # If the command was a failure, then raise an exception that is
           # nicely handled by Vagrant.
@@ -134,7 +134,7 @@ module VagrantPlugins
         end
 
         # Executes a command and returns the raw result object.
-        def raw(*command, &block)
+        def raw(*command, work_dir, &block)
           int_callback = lambda do
             @interrupted = true
 
@@ -147,7 +147,9 @@ module VagrantPlugins
           command << { notify: %i[stdout stderr] }
 
           Vagrant::Util::Busy.busy(int_callback) do
-            Vagrant::Util::Subprocess.execute(@simh_path, *command, &block)
+            Dir.chdir(work_dir) do
+              Vagrant::Util::Subprocess.execute(@simh_path, *command, &block)
+            end
           end
         rescue Vagrant::Util::Subprocess::LaunchError => e
           raise Vagrant::Errors::VBoxManageLaunchError,
